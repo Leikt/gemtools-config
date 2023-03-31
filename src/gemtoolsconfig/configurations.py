@@ -4,6 +4,10 @@ from .exceptions import ConfigurationLoaderFoundError, ConfigurationNotFoundErro
 DEFAULT_CONFIGURATION_NAME = 'config'
 DEFAULT_LOADER_NAME = 'default'
 
+# /!\ Enable for unit testing purposes only /!\
+ConfigurationItem = object
+ConfigurationLoader = object
+
 
 class Configurations:
     """
@@ -77,10 +81,10 @@ class Configurations:
         del cls.loaders[loader_name]
 
     @classmethod
-    def get(cls,
-            config_name: str = DEFAULT_CONFIGURATION_NAME,
-            allow_lazy_load: bool = True
-            ) -> ConfigurationItem:
+    def get_config(cls,
+                   config_name: str = DEFAULT_CONFIGURATION_NAME,
+                   allow_lazy_load: bool = True
+                   ) -> ConfigurationItem:
         """
         Gets the configuration with the given name.
 

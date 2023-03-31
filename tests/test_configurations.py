@@ -75,16 +75,16 @@ class TestConfigs(unittest.TestCase):
             Configurations.get_loader('not_found')
 
     def test_get(self):
-        self.assertEqual(self.config_default, Configurations.get(allow_lazy_load=False))
-        self.assertEqual(self.config_first, Configurations.get('first', allow_lazy_load=False))
+        self.assertEqual(self.config_default, Configurations.get_config(allow_lazy_load=False))
+        self.assertEqual(self.config_first, Configurations.get_config('first', allow_lazy_load=False))
         with self.assertRaises(ConfigurationNotFoundError):
-            Configurations.get('not_found', allow_lazy_load=False)
+            Configurations.get_config('not_found', allow_lazy_load=False)
 
     def test_get_lazy_load_allowed(self):
-        self.assertEqual(self.config_first, Configurations.get('new_first'))
+        self.assertEqual(self.config_first, Configurations.get_config('new_first'))
 
         loader = Mock()
         loader.configure_mock(**{'lazy_load.side_effect': ConfigurationNotFoundError})
         Configurations.loaders['default'] = loader
         with self.assertRaises(ConfigurationNotFoundError):
-            Configurations.get('not_found')
+            Configurations.get_config('not_found')
