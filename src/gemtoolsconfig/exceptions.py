@@ -52,3 +52,12 @@ class ConfigurationLoaderFoundError(Exception):
     same name already exists and `allow_overwrite` is set to `False`.
 
     """
+
+
+class ConfigurationHandlerError(Exception):
+    """Base class for configuration handler errors.
+
+    This exception is raised when an error occurs while handling a configuration,
+    such as during validation or processing.
+
+    """

@@ -1,8 +1,10 @@
 from types import MappingProxyType
 from typing import Any
 
+ConfigurationItem = MappingProxyType
 
-def freeze_configuration(obj: Any) -> Any:
+
+def freeze_configuration(obj: Any) -> ConfigurationItem:
     """
     Freeze a configuration object by recursively converting its dictionary and list attributes
     into immutable `MappingProxyType` objects.

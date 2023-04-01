@@ -1,14 +1,11 @@
-from types import MappingProxyType
+from .item import ConfigurationItem
+from .loader import ConfigurationLoader
 
 from .exceptions import ConfigurationLoaderFoundError, ConfigurationNotFoundError, \
     ConfigurationLoaderNotFoundError, critical
 
 DEFAULT_CONFIGURATION_NAME = 'config'
 DEFAULT_LOADER_NAME = 'default'
-
-# /!\ Enable for unit testing purposes only /!\
-ConfigurationLoader = object
-ConfigurationItem = MappingProxyType
 
 
 class Configurations:
@@ -123,3 +120,27 @@ class Configurations:
         if loader_name not in cls.loaders:
             critical(f'Loader "{loader_name}" cannot be found.', ConfigurationLoaderNotFoundError)
         return cls.loaders[loader_name]
+
+    @classmethod
+    def is_configuration_loaded(cls, name: str) -> bool:
+        """
+        Checks if a configuration with the given name has already been loaded.
+
+        :param name: A string representing the name of the configuration.
+        :type name: str
+        :return: A boolean value indicating whether the configuration is loaded.
+        :rtype: bool
+        """
+        return name in cls.configurations
+
+    @classmethod
+    def has_loader(cls, name: str) -> bool:
+        """
+        Checks if a configuration loader with the given name exists in the collection.
+
+        :param name: A string representing the name of the configuration loader.
+        :type name: str
+        :return: A boolean value indicating whether the configuration loader exists.
+        :rtype: bool
+        """
+        return name in cls.loaders
