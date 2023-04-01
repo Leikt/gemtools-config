@@ -1,3 +1,5 @@
+from types import MappingProxyType
+
 from .exceptions import ConfigurationLoaderFoundError, ConfigurationNotFoundError, \
     ConfigurationLoaderNotFoundError, critical
 
@@ -5,8 +7,8 @@ DEFAULT_CONFIGURATION_NAME = 'config'
 DEFAULT_LOADER_NAME = 'default'
 
 # /!\ Enable for unit testing purposes only /!\
-ConfigurationItem = object
 ConfigurationLoader = object
+ConfigurationItem = MappingProxyType
 
 
 class Configurations:
