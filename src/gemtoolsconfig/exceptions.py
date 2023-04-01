@@ -63,4 +63,10 @@ class ConfigurationHandlerError(Exception):
     """
 
 
-class ArgumentError(Exception): ...
+class ArgumentError(Exception):
+    """Raised when an invalid argument is passed to a function.
+
+    This error is raised when an argument passed to a function is not valid
+    according to the function's specifications. The error message should
+    provide which argument is invalid.
+    """

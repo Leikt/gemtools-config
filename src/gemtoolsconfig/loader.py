@@ -5,6 +5,7 @@ from .exceptions import critical, ConfigurationHandlerError
 from .item import freeze_configuration, ConfigurationItem
 from .handlers import LazyHandler, LoadingHandler, KEY_RESULT
 
+
 class ConfigurationLoader:
     def __init__(self,
                  lazy_handlers: list[LazyHandler],
