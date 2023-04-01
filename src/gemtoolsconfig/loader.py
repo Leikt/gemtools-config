@@ -1,14 +1,9 @@
 from __future__ import annotations
-from typing import Callable, Any
+from typing import Any
 
 from .exceptions import critical, ConfigurationHandlerError
 from .item import freeze_configuration, ConfigurationItem
-
-LoadingHandler = Callable[[dict], dict]
-LazyHandler = Callable[[dict], dict]
-
-KEY_RESULT = '__result__'
-
+from .handlers import LazyHandler, LoadingHandler, KEY_RESULT
 
 class ConfigurationLoader:
     def __init__(self,

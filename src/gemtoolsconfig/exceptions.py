@@ -61,3 +61,6 @@ class ConfigurationHandlerError(Exception):
     such as during validation or processing.
 
     """
+
+
+class ArgumentError(Exception): ...
