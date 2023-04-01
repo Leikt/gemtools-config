@@ -1,3 +1,4 @@
+import os
 from functools import partial
 from os import PathLike
 from pathlib import Path
@@ -15,18 +16,6 @@ DEFAULT_PATH = '.'
 DEFAULT_CONFIG_PATH = 'config.toml'
 
 _MISSING = object()
-
-
-def find_suitable_file(path: Path) -> Path:
-    import os
-    for filename in os.listdir(path.parent):
-        if isinstance(filename, bytes):
-            filename = filename.decode()
-        if filename.split('.')[0] != path.name:
-            continue
-        filename = filename.removesuffix('.fer')
-        return path / Path(filename)
-    raise FileNotFoundError(str(path))
 
 
 def get_argument(kwargs: dict,
@@ -80,6 +69,17 @@ filter configuration data lazily, i.e. on-demand when the data is accessed for t
 
 
 def from_source(params: dict) -> dict:
+    """
+    Load configuration data from a string source.
+
+    :param params: A dictionary containing parameters for loading configuration data.
+                   The dictionary must contain the following keys:
+                   - 'text': The string containing the configuration data to load.
+                   - 'format': The format of the configuration data.
+    :type params: dict
+    :return: A dictionary containing the loaded configuration data under the KEY_RESULT key.
+    :rtype: dict
+    """
     source_text = get_argument(params, 'text')
     source_format = get_argument(params, 'format')
     params[KEY_RESULT] = load_string(source_text, source_format)
@@ -87,6 +87,19 @@ def from_source(params: dict) -> dict:
 
 
 def get_file_handler(directory: Union[PathLike, str] = DEFAULT_PATH, key: bytes = None) -> LoadingHandler:
+    """
+    Get a handler for loading configuration data from a file.
+
+    :param directory: The directory where the configuration file is located. Defaults to the current directory.
+    :type directory: Union[PathLike, str]
+    :param key: Optional encryption key for encrypted configuration files. Defaults to None.
+    :type key: bytes, optional
+    :return: A callable that takes a dictionary containing parameters for loading configuration data
+             from a file, and returns a dictionary containing the loaded configuration data under
+             the KEY_RESULT key.
+    :rtype: LoadingHandler
+    :raises: NotADirectoryError if the specified directory does not exist.
+    """
     directory = Path(directory)
     if not directory.exists():
         critical(str(directory), NotADirectoryError)
@@ -97,10 +110,56 @@ def get_file_handler(directory: Union[PathLike, str] = DEFAULT_PATH, key: bytes 
         load = load_file
 
     def handler(params: dict) -> dict:
-        file_path = get_argument(params, 'path', DEFAULT_CONFIG_PATH)
-        file_path = find_suitable_file(directory / Path(file_path))
-        params['full_path'] = directory / Path(file_path)
+        file_path = directory / get_argument(params, 'path', DEFAULT_CONFIG_PATH)
+        params['full_path'] = file_path
         params[KEY_RESULT] = load(file_path)
+        return params
+
+    return handler
+
+
+def _find_suitable_file(directory: Path, config_name: str) -> str:
+    """
+    Find a suitable configuration file in the specified directory.
+
+    :param directory: The directory where the configuration files are located. Defaults to the current directory.
+    :type directory: Union[PathLike, str]
+    :param config_name: The name of the configuration file.
+    :type config_name: str
+    :return: The name of the configuration file found in the directory.
+    :rtype: str
+    :raises: FileNotFoundError if no suitable configuration file is found in the directory.
+    """
+    for filename in os.listdir(directory):
+        if isinstance(filename, bytes):
+            filename = filename.decode()
+
+        if filename == config_name:
+            return config_name
+
+        if filename.split('.')[0] == config_name:
+            return filename
+    raise FileNotFoundError(f'Cannot find a suitable configuration file for "{config_name}" in "{str(directory)}".')
+
+
+def get_find_suitable_file_handler(directory: Union[PathLike, str] = DEFAULT_PATH) -> LazyHandler:
+    """
+    Get a handler for finding a suitable configuration file.
+
+    :param directory: The directory where the configuration files are located. Defaults to the current directory.
+    :type directory: Union[PathLike, str]
+    :return: A callable that takes a dictionary containing parameters for finding a suitable configuration file,
+             and returns a dictionary containing the path of the configuration file found in the directory.
+    :rtype: LazyHandler
+    :raises: NotADirectoryError if the specified directory does not exist.
+    """
+    directory = Path(directory)
+    if not directory.exists():
+        critical(str(directory), NotADirectoryError)
+
+    def handler(params: dict) -> dict:
+        config_name = get_argument(params, 'name')
+        params['path'] = _find_suitable_file(directory, config_name)
         return params
 
     return handler
