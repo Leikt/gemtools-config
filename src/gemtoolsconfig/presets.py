@@ -6,7 +6,7 @@ from .loader import ConfigurationLoader, ConfigurationLoaderBuilder
 from .handlers import from_source, DEFAULT_PATH, get_file_handler, get_find_suitable_file_handler
 
 
-def source_loader() -> ConfigurationLoader:
+def preset_source_loader() -> ConfigurationLoader:
     """
     Get a configuration loader that loads configuration data from a source string.
 
@@ -18,9 +18,9 @@ def source_loader() -> ConfigurationLoader:
     return builder.build()
 
 
-def file_loader(directory: Union[PathLike, str] = DEFAULT_PATH,
-                key_file: Union[PathLike, str] = None
-                ) -> ConfigurationLoader:
+def preset_file_loader(directory: Union[PathLike, str] = DEFAULT_PATH,
+                       key_file: Union[PathLike, str] = None
+                       ) -> ConfigurationLoader:
     """
     Get a configuration loader that loads configuration data from a file.
 

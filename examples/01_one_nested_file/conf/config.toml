@@ -1,0 +1,7 @@
+[app]
+name = "MyApp"
+version = "1.0.0"
+
+[debug]
+enabled = true
+level = "info"
