@@ -2,7 +2,7 @@ from .item import ConfigurationItem
 from .loader import ConfigurationLoader
 
 from .exceptions import ConfigurationLoaderFoundError, ConfigurationNotFoundError, \
-    ConfigurationLoaderNotFoundError, critical
+    ConfigurationLoaderNotFoundError, critical, ConfigurationLoadingError
 
 DEFAULT_CONFIGURATION_NAME = 'config'
 DEFAULT_LOADER_NAME = 'default'
@@ -27,7 +27,7 @@ class Configurations:
 
     @classmethod
     def unload(cls,
-               config_name: str = DEFAULT_CONFIGURATION_NAME
+               config_name: str = None
                ):
         """
         Unloads the configuration with the given name.
@@ -37,6 +37,8 @@ class Configurations:
         :raises ConfigurationNotFoundError: If the specified configuration does not exist.
         :return: None
         """
+        if config_name is None:
+            config_name = DEFAULT_CONFIGURATION_NAME
         if config_name not in cls.configurations:
             critical(f'Configuration "{config_name}" cannot be found.', ConfigurationNotFoundError)
         del cls.configurations[config_name]
@@ -44,7 +46,7 @@ class Configurations:
     @classmethod
     def add_loader(cls,
                    loader: ConfigurationLoader,
-                   loader_name: str = DEFAULT_LOADER_NAME,
+                   loader_name: str = None,
                    allow_overwrite: bool = False
                    ):
         """
@@ -59,13 +61,15 @@ class Configurations:
         :raises ConfigurationLoaderFoundError: If a loader with the specified name already exists and `allow_overwrite` is `False`.
         :return: None
         """
+        if loader_name is None:
+            loader_name = DEFAULT_LOADER_NAME
         if loader_name in cls.loaders and not allow_overwrite:
             critical(f'A loader named "{loader_name}" already exists.', ConfigurationLoaderFoundError)
         cls.loaders[loader_name] = loader
 
     @classmethod
     def remove_loader(cls,
-                      loader_name: str = DEFAULT_LOADER_NAME
+                      loader_name: str = None
                       ):
         """
         Removes the configuration loader with the given name.
@@ -75,13 +79,39 @@ class Configurations:
         :raises ConfigurationLoaderNotFoundError: If the specified loader does not exist.
         :return: None
         """
+        if loader_name is None:
+            loader_name = DEFAULT_LOADER_NAME
         if loader_name not in cls.loaders:
             critical(f'Loader "{loader_name}" cannot be found.', ConfigurationLoaderNotFoundError)
         del cls.loaders[loader_name]
 
     @classmethod
+    def load_config(cls,
+                    config_name: str = None,
+                    loader_name: str = None,
+                    allow_overwrite: bool = False,
+                    **parameters,
+                    ) -> ConfigurationItem:
+        if config_name is None:
+            config_name = DEFAULT_CONFIGURATION_NAME
+        if loader_name is None:
+            loader_name = DEFAULT_LOADER_NAME
+        config = cls.get_loader(loader_name).load(**parameters)
+        cls.add_config(config, config_name=config_name, allow_overwrite=allow_overwrite)
+        return config
+
+    @classmethod
+    def add_config(cls, config: ConfigurationItem, config_name: str = None, allow_overwrite: bool = False):
+        if config_name is None:
+            config_name = DEFAULT_CONFIGURATION_NAME
+        if config_name in cls.configurations and not allow_overwrite:
+            critical(f'Configuration "{config_name}" is already loaded. Allow overwrite to erase the old one.',
+                     ConfigurationLoadingError)
+        cls.configurations[config_name] = config
+
+    @classmethod
     def get_config(cls,
-                   config_name: str = DEFAULT_CONFIGURATION_NAME,
+                   config_name: str = None,
                    allow_lazy_load: bool = True
                    ) -> ConfigurationItem:
         """
@@ -95,17 +125,19 @@ class Configurations:
         :return: The requested configuration.
         :rtype: ConfigurationItem
         """
+        if config_name is None:
+            config_name = DEFAULT_CONFIGURATION_NAME
         if config_name not in cls.configurations:
             if not allow_lazy_load:
                 critical(f'Configuration "{config_name}" cannot be found. Lazy load is not allowed in this context.',
                          ConfigurationNotFoundError)
             config = cls.get_loader().lazy_load(config_name)
-            cls.configurations[config_name] = config
+            cls.add_config(config, config_name)
         return cls.configurations[config_name]
 
     @classmethod
     def get_loader(cls,
-                   loader_name: str = DEFAULT_LOADER_NAME
+                   loader_name: str = None
                    ) -> ConfigurationLoader:
         """
         Get the configuration loader instance associated with the given loader name.
@@ -117,6 +149,8 @@ class Configurations:
         :return: The configuration loader instance associated with the given name.
         :rtype: ConfigurationLoader
         """
+        if loader_name is None:
+            loader_name = DEFAULT_LOADER_NAME
         if loader_name not in cls.loaders:
             critical(f'Loader "{loader_name}" cannot be found.', ConfigurationLoaderNotFoundError)
         return cls.loaders[loader_name]

@@ -18,7 +18,10 @@ class TestConfigs(unittest.TestCase):
         }
 
         self.loader_default = Mock()
-        self.loader_default.configure_mock(**{'lazy_load.return_value': self.config_first})
+        self.loader_default.configure_mock(**{
+            'lazy_load.return_value': self.config_first,
+            'load.return_value': self.config_first
+        })
 
         self.loader_valid = Mock()
         self.loader_valid.configure_mock(**{'lazy_load.return_value': self.config_second})
@@ -88,3 +91,7 @@ class TestConfigs(unittest.TestCase):
         Configurations.loaders['default'] = loader
         with self.assertRaises(ConfigurationNotFoundError):
             Configurations.get_config('not_found')
+
+    def test_load(self):
+        self.assertEqual(self.config_first, Configurations.load_config('other', path='./dummy.toml'))
+        self.assertEqual(self.config_first, Configurations.get_config('other'))
