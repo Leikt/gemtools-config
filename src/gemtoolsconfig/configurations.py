@@ -1,5 +1,4 @@
-from .item import ConfigurationItem
-from .loader import ConfigurationLoader
+from .loader import ConfigurationLoader, ConfigurationItem
 
 from .exceptions import ConfigurationLoaderFoundError, ConfigurationNotFoundError, \
     ConfigurationLoaderNotFoundError, critical, ConfigurationLoadingError
@@ -92,6 +91,23 @@ class Configurations:
                     allow_overwrite: bool = False,
                     **parameters,
                     ) -> ConfigurationItem:
+        """
+        Load a configuration using a loader with the given name and parameters, and add it to the
+        `configurations` dictionary under the given name.
+
+        :param config_name: The name to use for the loaded configuration. Defaults to `DEFAULT_CONFIGURATION_NAME`.
+        :type config_name: str, optional
+        :param loader_name: The name of the loader to use for loading the configuration. Defaults to `DEFAULT_LOADER_NAME`.
+        :type loader_name: str, optional
+        :param allow_overwrite: Whether to allow overwriting an existing configuration with the same name.
+                                Defaults to `False`.
+        :type allow_overwrite: bool, optional
+        :param **parameters: Additional parameters to pass to the loader when loading the configuration.
+        :type **parameters: dict, optional
+        :return: The loaded configuration item.
+        :rtype: ConfigurationItem
+        :raises ConfigurationLoadingError: If an error occurs while loading the configuration.
+        """
         if config_name is None:
             config_name = DEFAULT_CONFIGURATION_NAME
         if loader_name is None:
@@ -101,7 +117,23 @@ class Configurations:
         return config
 
     @classmethod
-    def add_config(cls, config: ConfigurationItem, config_name: str = None, allow_overwrite: bool = False):
+    def add_config(cls,
+                   config: ConfigurationItem,
+                   config_name: str = None,
+                   allow_overwrite: bool = False
+                   ):
+        """
+        Add a configuration to the `configurations` dictionary under the given name.
+
+        :param config: The configuration item to add.
+        :type config: ConfigurationItem
+        :param config_name: The name to use for the configuration. Defaults to `DEFAULT_CONFIGURATION_NAME`.
+        :type config_name: str, optional
+        :param allow_overwrite: Whether to allow overwriting an existing configuration with the same name.
+                                Defaults to `False`.
+        :type allow_overwrite: bool, optional
+        :raises ConfigurationLoadingError: If an error occurs while adding the configuration.
+        """
         if config_name is None:
             config_name = DEFAULT_CONFIGURATION_NAME
         if config_name in cls.configurations and not allow_overwrite:

@@ -4,7 +4,6 @@ from pathlib import Path
 
 from gemtoolsio import encrypt_file, generate_key
 
-from gemtoolsconfig.item import ConfigurationItem
 from gemtoolsconfig.presets import preset_file_loader
 
 TEMP_DIR = Path('tmp_preset_file')
@@ -25,10 +24,10 @@ class TestPresetFile(unittest.TestCase):
         # Test
         loader = preset_file_loader(TEMP_DIR)
         result = loader.load(path='config.toml')
-        self.assertEqual(ConfigurationItem({'key': 'value'}), result)
+        self.assertEqual({'key': 'value'}, result)
 
         result = loader.lazy_load('config')
-        self.assertEqual(ConfigurationItem({'key': 'value'}), result)
+        self.assertEqual({'key': 'value'}, result)
 
     def test_encrypted(self):
         # Setup
@@ -39,9 +38,9 @@ class TestPresetFile(unittest.TestCase):
         # Test
         loader = preset_file_loader(TEMP_DIR, key_file=TEMP_DIR / 'dummy.key')
         result = loader.load(path='config.toml')
-        self.assertEqual(ConfigurationItem({'key': 'value'}), result)
+        self.assertEqual({'key': 'value'}, result)
 
         result = loader.lazy_load('config')
-        self.assertEqual(ConfigurationItem({'key': 'value'}), result)
+        self.assertEqual({'key': 'value'}, result)
 
 
