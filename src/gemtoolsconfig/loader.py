@@ -2,8 +2,9 @@ from __future__ import annotations
 from typing import Any
 
 from .exceptions import critical, ConfigurationHandlerError
-from .item import freeze_configuration, ConfigurationItem
 from .handlers import LazyHandler, LoadingHandler, KEY_RESULT
+
+ConfigurationItem = dict
 
 
 class ConfigurationLoader:
@@ -45,7 +46,7 @@ class ConfigurationLoader:
                 f'The loader gets a configuration with an invalid type: expect dict or list, got {type(configuration)}',
                 ConfigurationHandlerError)
 
-        return freeze_configuration(parameters[KEY_RESULT])
+        return parameters[KEY_RESULT]
 
     def lazy_load(self, name: str) -> ConfigurationItem:
         """

@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from gemtoolsconfig.exceptions import ConfigurationHandlerError
-from gemtoolsconfig.item import ConfigurationItem, freeze_configuration
 from gemtoolsconfig.loader import ConfigurationLoader, KEY_RESULT
 
 
@@ -29,8 +28,7 @@ class TestConfigurationLoader(unittest.TestCase):
         # Test that load() returns a ConfigurationItem when called with a valid configuration.
         configuration = {'key': 'value'}
         parameters = {KEY_RESULT: configuration}
-        expected = ConfigurationItem(freeze_configuration(configuration))
-        self.assertEqual(self.loader.load(**parameters), expected)
+        self.assertEqual(self.loader.load(**parameters), configuration)
 
     def test_lazy_load_with_invalid_parameters(self):
         # Test that a ConfigurationHandlerError is raised when lazy_load() is called with invalid parameters.
@@ -43,8 +41,6 @@ class TestConfigurationLoader(unittest.TestCase):
         # Test that lazy_load() returns a ConfigurationItem when called with valid parameters.
         name = 'test'
         configuration = {'key': 'value'}
-        parameters = {KEY_RESULT: configuration}
-        expected = ConfigurationItem(freeze_configuration(configuration))
 
-        with patch.object(self.loader, 'load', MagicMock(return_value=expected)):
-            self.assertEqual(self.loader.lazy_load(name), expected)
+        with patch.object(self.loader, 'load', MagicMock(return_value=configuration)):
+            self.assertEqual(self.loader.lazy_load(name), configuration)
