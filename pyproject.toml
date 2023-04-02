@@ -18,7 +18,8 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 dependencies = [
-    "gemtoolsio @ git+https://github.com/Leikt/gemtools-io.git@v1.0.5"
+    "gemtoolsio @ git+https://github.com/Leikt/gemtools-io.git@v1.0.6",
+    "six==1.16.0"
 ]
 
 #[project.urls]
